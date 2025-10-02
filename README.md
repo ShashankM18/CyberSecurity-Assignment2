@@ -1,29 +1,82 @@
 # Assignment 2 — Cybersecurity Prototype
 
-This repository is a ready-to-upload GitHub project demonstrating prototype implementations for an assignment based on the chosen research paper.
+# Trust, Isolation, and Blockchain — Toy Prototype
 
-Modules included (toy / prototype implementations):
-- multi_agent_trust/: simulates agents, interactions, and trust score updates with attack scenarios.
-- blockchain_ledger/: minimal blockchain implementation for verification of audit logs and actions.
-- dynamic_isolation/: simulated dynamic isolation manager that "isolates" malicious agents or tasks.
-- benchmark/: scripts to benchmark core operations (trust updates, block creation, isolation actions).
-- docs/: documentation and design notes.
-- examples/: example runs and sample outputs.
-- requirements.txt, LICENSE, and instructions to run locally.
+This project demonstrates a simple end-to-end security prototype:
+- A trust model that updates agent trust scores based on actions.
+- Dynamic isolation and release of agents when needed.
+- A minimal blockchain ledger to record isolation/release actions.
+- Benchmarks and a web dashboard to visualize and control everything.
 
-Important: These are educational, simplified prototypes meant to be extended for production use.
-See docs/ for details, design rationale, and extension ideas.
+These are educational, simplified components intended for learning and demos.
 
-Quick start:
-1. Create Python venv (Python 3.10+ recommended):
-   python -m venv venv
-   source venv/bin/activate  # Linux/macOS
-   venv\Scripts\activate    # Windows PowerShell
-2. Install deps:
-   pip install -r requirements.txt
-3. Generate data and run demos:
-   python examples/run_all.py
-4. Run benchmarks (example):
-   python benchmark/run_benchmarks.py --out results/benchmarks.json
+## Features
+- **Trust**: `multi_agent_trust/trust_sim.py` updates trust toward 1.0 for benign actions and toward 0.0 for malicious ones, with a small decay per observation.
+- **Blockchain**: `blockchain_ledger/simple_chain.py` appends blocks with a tiny proof-of-work simulation and integrity checks via `is_valid()`.
+- **Isolation**: `dynamic_isolation/manager.py` isolates/releases agents and logs each event to the blockchain.
+- **Benchmarks**: `benchmark/run_benchmarks.py` measures throughput for trust updates, block creation, and isolation.
+- **Web UI**: `webapp/app.py` (Flask) serves a dashboard to view agents, trigger isolation/release, see the ledger, and run benchmarks.
 
-Push this folder to GitHub as your project repository.
+## Project Structure
+- `multi_agent_trust/` — trust logic (`trust_sim.py`)
+- `blockchain_ledger/` — blockchain (`simple_chain.py`)
+- `dynamic_isolation/` — isolation manager (`manager.py`)
+- `benchmark/` — CLI benchmarks (`run_benchmarks.py`)
+- `webapp/` — Flask app (`app.py`, `templates/index.html`, `static/main.js`)
+- `tests/` — sample test (`test_trust.py`)
+- `results/` — benchmark outputs
+- `requirements.txt` — dependencies (Flask for the web UI)
+
+## Prerequisites
+- Python 3.10+ (tested with 3.12)
+- Windows PowerShell examples below (adjust for macOS/Linux as needed)
+
+## Setup
+```
+# From project root
+python -m venv venv
+./venv/Scripts/Activate.ps1
+python -m pip install -U pip -r requirements.txt
+```
+
+## Run the Web UI (Dashboard)
+```
+# From project root
+python webapp/app.py
+```
+Open http://127.0.0.1:5000
+
+Dashboard capabilities:
+- View agents and live trust scores.
+- Send benign/malicious actions to update trust.
+- Isolate/Release agents (writes blocks to the ledger).
+- View blockchain entries and validity.
+- Run benchmarks and view results JSON.
+
+## Run Benchmarks (CLI)
+Recommended: module mode to ensure imports work from project root.
+```
+python -m benchmark.run_benchmarks --out results/benchmarks.json
+Type ./results/benchmarks.json
+```
+Custom options:
+```
+python -m benchmark.run_benchmarks --trust-ops 2000 --block-n 300 --iso-ops 500 --out results/bench_custom.json
+```
+
+## Run Tests (optional)
+```
+python -m pip install -U pytest
+python -m pytest -q
+```
+
+## Troubleshooting
+- If you see `ModuleNotFoundError` when running by path, run modules instead:
+  - Web: `python -m webapp.app`
+  - Benchmarks: `python -m benchmark.run_benchmarks`
+- The web app already adjusts `sys.path` for direct execution.
+- The blockchain’s proof-of-work gets slower with higher `difficulty`.
+
+## Notes
+This is a toy prototype for learning. It is not production-ready (no persistence, no auth, simplified PoW and trust rules).
+
